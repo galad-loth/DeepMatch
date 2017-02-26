@@ -11,7 +11,7 @@ batch_size=100
 train_net=GetDeepCompareSymbol("2ch",True)
 model = mx.model.FeedForward(
          train_net,
-         ctx=mx.context.cpu(),
+         ctx=mx.context.gpu(),
          num_epoch=10,
          learning_rate=0.001,
          momentum=0.1,
