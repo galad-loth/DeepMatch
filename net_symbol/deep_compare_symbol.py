@@ -1,36 +1,7 @@
 import numpy as npy
 import mxnet as mx
 
-class DeepCompareLossLayer(mx.operator.NumpyOp):
-    def __init__(self):
-        super(DeepCompareLossLayer, self).__init__(False)
-        
-    def list_arguments(self):
-        return ['data','label']
-        
-    def list_outputs(self):
-        return ['outputs']
-        
-    def infer_shape(self, in_shape):
-        data_shape=in_shape[0]
-        label_shape=(in_shape[0][0],)
-        return [data_shape, label_shape],[data_shape]
-        
-    def forward(self, in_data, out_data):
-        x=in_data[0]
-        l=in_data[1]
-        y=out_data[0]
-        y[:]=npy.ones((x.shape[0],1))-l.reshape((x.shape[0],1))*x  
-        
-        
-    def backward(self, out_grad, in_data, out_data, in_grad):
-        l=in_data[1]
-        y = out_data[0] 
-        dx=in_grad[0]
-        
-        dx[:]=1
-        dx[l>0]=-1
-        dx[y<0]=0
+from custom_layers import DeepCompareLossLayer
 
 def GetSharedConvNet(data,conv_weight, conv_bias):
     shared_net = mx.sym.Convolution(data=data, kernel=(7, 7), stride=(3,3),
@@ -109,20 +80,49 @@ def DeepCompareSymbolTwoChannelDeep():
     net = mx.sym.Flatten(data=net)
     net = mx.sym.FullyConnected(data=net,num_hidden=1, name="fc")
     return net
+  
+def TwoChannelTwoStreamBranch(data, branch):
+    net = mx.sym.Convolution(data=data, kernel=(5, 5), stride=(1,1),
+                             pad=(2, 2), num_filter=95,name=branch+"conv0")
+    net = mx.sym.Activation(data=net, act_type="relu", name=branch+"relu0")
+    net = mx.sym.Pooling(data=net, kernel=(2,2),pool_type="max",                           
+                           stride=(2,2), name=branch+"maxpool0")
+    net = mx.sym.Convolution(data=net, kernel=(3, 3), stride=(1,1),
+                             pad=(1, 1), num_filter=96,name=branch+"conv1")
+    net = mx.sym.Activation(data=net, act_type="relu", name=branch+"relu1")
+    net = mx.sym.Pooling(data=net,kernel=(2,2),pool_type="max",
+                            stride=(2,2), name=branch+"maxpool1")
+    net = mx.sym.Convolution(data=net, kernel=(3, 3), stride=(1,1),
+                             pad=(1, 1), num_filter=192,name=branch+"conv2")
+    net = mx.sym.Activation(data=net, act_type="relu", name=branch+"relu2")
+    return net
+    
+def DeepCompareSymbolTwoChannelTwoStream():
+    datao= mx.sym.Variable("data1")
+    datac= mx.sym.Variable("data2")
+    net_b1=TwoChannelTwoStreamBranch(datao,"b1")
+    net_b2=TwoChannelTwoStreamBranch(datac,"b2")
+    conv_res=mx.sym.Concat(net_b1,net_b2,dim=1, name='conv_res')
+    net = mx.sym.FullyConnected(data=conv_res,num_hidden=768, name="fc1")
+    net = mx.sym.Activation(data=net, act_type="relu", name="relu1")
+    net = mx.sym.FullyConnected(data=net,num_hidden=1, name="fc2")
+    return net
+    
+    
 
 def GetDeepCompareSymbol(net_type,is_train):
     if net_type=="2ch":
-       net=DeepCompareSymbolTwoChannelDeep()
+       net=DeepCompareSymbolTwoChannel()
        if is_train:
            op_loss=DeepCompareLossLayer()
            net=op_loss(data=net,name="loss")
        return net
-    if net_type=="2ch":
+    if net_type=="siam":
         net=DeepCompareSymbolSiamese()
         if is_train:
             op_loss=DeepCompareLossLayer()
             net=op_loss(data=net,name="loss")
-    return net 
+        return net 
         
 if __name__=="__main__":
     net=GetDeepCompareSymbol('2ch',True)
