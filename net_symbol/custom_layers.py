@@ -89,7 +89,63 @@ class TripletLossLayer(mx.operator.NumpyOp):
         dx1[y<=0]=0
         dx2[y<=0]=0
 
+class TripletRatioLossLayer(mx.operator.NumpyOp):
+    def __init__(self, margin):
+        super(TripletRatioLossLayer, self).__init__(False)
+        self.margin=margin
+        
+    def list_arguments(self):
+        return ['data0','data1','data2']
+        
+    def list_outputs(self):
+        return ['triplet_ratio_loss']
+        
+    def infer_shape(self, in_shape):
+        data_shape0=in_shape[0]
+        data_shape1=in_shape[1]
+        data_shape2=in_shape[2]
+        if (data_shape0!=data_shape1) or (data_shape0!=data_shape2):
+            raise ValueError("Shape of inputs does not match:"
+                              "{}{}{}".format(data_shape0, data_shape1,data_shape2))            
+        
+        return [data_shape0, data_shape1,data_shape2],[data_shape0[0]]
+        
+    def forward(self, in_data, out_data):
+        x0=in_data[0]
+        x1=in_data[1]
+        x2=in_data[2]
+        y=out_data[0]
+        dp=x0-x1
+        dn=x0-x2
+        dp=dp*dp
+        dn=dn*dn
+        loss=npy.maximum(0, 1-dn/(dp+self.margin))
+        y[:]=loss
+        
+#        y[:]=npy.ones((x.shape[0],1))-l.reshape((x.shape[0],1))*x  
+        
+    def backward(self, out_grad, in_data, out_data, in_grad):
+        x0=in_data[0]
+        x1=in_data[1]
+        x2=in_data[2]
+        y=out_data[0]
+        dx0=in_grad[0]
+        dx1=in_grad[1]
+        dx2=in_grad[2]
+        dp=x0-x1
+        dn=x0-x2
+        temp=dp*dp+self.margin
+        
+        dx1[:]=-2*dn*dn*dp/temp/temp
+        dx2[:]=2*dn/temp
+        dx0[:]=-dx1-dx2
+        dx0[y<=0]=0
+        dx1[y<=0]=0
+        dx2[y<=0]=0
+        
 
+
+     
 
 
 
