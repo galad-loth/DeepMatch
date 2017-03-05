@@ -2,7 +2,7 @@
 """
 Created on Sat Mar 04 08:00:11 2017
 
-@author: Fengjilan
+@author: galad-loth
 """
 import numpy as npy
 import mxnet as mx
@@ -34,10 +34,10 @@ def train_deep_compare():
 
     datadir="E:\\DevProj\\Datasets\\UBCPatch"
     dataset="liberty"
-    gt_file="m50_100000_100000_0.txt"
+    gt_file="m50_200000_200000_0.txt"
     batch_size=50
     trainIter,valIter=GetUBCPatchDataIter(datadir, dataset,gt_file, 
-                                          batch_size, "2ch",True,0.1)
+                                          batch_size, "2ch",True,0.05)
     model_prefix="deep_compare"
     checkpoint = mx.callback.do_checkpoint(model_prefix) 
 
