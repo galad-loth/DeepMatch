@@ -2,7 +2,7 @@
 """
 Created on Sat Mar 04 08:02:59 2017
 
-@author: Fengjilan
+@author: galad-loth
 """
 import numpy as npy
 import mxnet as mx
@@ -38,6 +38,43 @@ class DeepCompareLossLayer(mx.operator.NumpyOp):
         dx[:]=1.0
         dx[l>0]=-1.0
         dx[y<0]=0.0
+
+
+class SiameseEmbedLossLayer(mx.operator.NumpyOp):
+    def __init__(self):
+        super(SiameseEmbedLossLayer, self).__init__(False)
+        
+    def list_arguments(self):
+        return ['data0','data1', 'label']
+        
+    def list_outputs(self):
+        return ['outputs']
+        
+    def infer_shape(self, in_shape):
+        data_shape=in_shape[0]
+        label_shape=(in_shape[0][0],)
+        return [data_shape, data_shape, label_shape],[data_shape]
+        
+    def forward(self, in_data, out_data):
+        x0=in_data[0]
+        x1=in_data[1]
+        l=in_data[2]
+        y=out_data[0]
+        d=(x0-x1)*(x0-x1)
+        y[l>0]=d[l>0]
+        y[l<0]=-d[l<0]
+        
+    def backward(self, out_grad, in_data, out_data, in_grad):
+        x0=in_data[0]
+        x1=in_data[1]
+        l=in_data[2]        
+        dx0=in_grad[0]
+        dx1=in_grad[1]        
+        d=2*(x0-x1)
+        
+        dx0[l>0]=d[l>0]
+        dx0[l<0]=-d[l<0]
+        dx1=-dx0
         
 class TripletLossLayer(mx.operator.NumpyOp):
     def __init__(self, margin):

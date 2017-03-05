@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Feb 25 09:35:33 2017
+
+@author: galad-loth
+"""
 import numpy as npy
 import mxnet as mx
 

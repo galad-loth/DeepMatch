@@ -2,7 +2,7 @@
 """
 Created on Sat Mar 04 08:55:52 2017
 
-@author: Fengjilan
+@author: galad-loth
 """
 
 import mxnet as mx
