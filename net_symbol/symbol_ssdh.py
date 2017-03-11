@@ -36,9 +36,10 @@ class HashLossLayer(mx.operator.NumpyOp):
         x=in_data[0]
         dx=in_grad[0]
         
-        grad1=-2*(x-0.5)
+        grad1=-2*(x-0.5)/x.shape[1]
         mu=npy.mean(x,axis=1)
         grad2=2*(mu-0.5)/x.shape[1]
+        
         grad=self.w_bin*grad1+self.w_balance*grad2
         dx[:]=grad
 
@@ -53,11 +54,11 @@ def get_finetune_symbol(net_pre,arg_params,
     """
     all_layers = net_pre.get_internals()
     load_net = all_layers[layer_name+'_output']
-    latent = mx.symbol.FullyConnected(data=load_net, num_hidden=num_latent, name='latent')
-    latent = mx.sym.Activation(data=latent, act_type="sigmoid", name="sigmoid")
-    class_net = mx.symbol.FullyConnected(data=latent, num_hidden=num_class, name='fc')
+    latent = mx.symbol.FullyConnected(data=load_net, num_hidden=num_latent, name='latent_ssdh')
+    latent = mx.sym.Activation(data=latent, act_type="sigmoid", name="sigmoid_ssdh")
+    class_net = mx.symbol.FullyConnected(data=latent, num_hidden=num_class, name='fc_ssdh')
     class_net = mx.symbol.SoftmaxOutput(data=class_net, name='softmax')
-    hash_loss=HashLossLayer(0.01,0.01)
+    hash_loss=HashLossLayer(0.1,0.1)
     hash_net=hash_loss(data=latent, name="hash")
     net = mx.sym.Group([class_net,hash_net])
     new_args = dict({k:arg_params[k] for k in arg_params if 'fc' not in k})
