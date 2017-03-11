@@ -38,8 +38,8 @@ model = mx.mod.Module(symbol= new_net, context= mx.cpu())
 optimizer = mx.optimizer.create('sgd',
                                 learning_rate =0.001,
                                 momentum = 0.9,
-                                wd = 0.001,
-                                lr_scheduler=mx.lr_scheduler.FactorScheduler(1000,0.9))
+                                wd = 0.0005,
+                                lr_scheduler=mx.lr_scheduler.FactorScheduler(200,0.9))
 new_net_args=new_net.list_arguments()
 lr_scale={}
 for arg_name in new_net_args:
