@@ -13,4 +13,4 @@ The implementation is based on MxNet.
 
 [5] Kumar B G, Carneiro G, Reid I. Learning local image descriptors with deep siamese and triplet convolutional networks by minimising global loss functions[C]//Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. 2016: 5385-5394.
 
-[6] Balntas V, Johns E, Tang L, et al. PN-Net: conjoined triple deep network for learning local image descriptors[J]. arXiv preprint arXiv:1601.05030, 2016.
+[6] Yang H F, Lin K, Chen C S. Supervised Learning of Semantics-Preserving Hash via Deep Convolutional Neural Networks[J]. IEEE Transactions on Pattern Analysis and Machine Intelligence, 2017.
