@@ -1,5 +1,5 @@
 # LearnDescriptor
-Image/Keypoint descriptor learning with deep (convolutional) neural network.
+Image/Keypoint descriptor learning with convolutional neural network.
 The implementation is based on MxNet.
 
 ##Reference
