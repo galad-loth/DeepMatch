@@ -1,8 +1,7 @@
 import numpy as npy
 import mxnet as mx
 
-def PNAccuracy(gt_label, pred_val):
-#    print pred_val
+def pn_accuracy(gt_label, pred_val):
     pred_label=npy.ones(pred_val.shape,dtype=npy.int8)
     pred_label[pred_val<0]=-1
     if len(gt_label.shape) == 1:
