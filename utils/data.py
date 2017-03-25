@@ -64,13 +64,14 @@ class UBCPatchDataIter(mx.io.DataIter):
         else:
             raise StopIteration
 
-def LoadUBCPatchData(datadir,dataname):
+def load_UBC_patch_data(datadir,dataname):
     patch_width=64
     patch_height=64    
     imgdir=os.path.join(datadir,dataname,"images")
     file_list=os.listdir(imgdir)
     num_files=len(file_list)
-    data_all=npy.zeros((num_files*256,patch_height,patch_width),dtype=npy.uint8)
+    data_all=npy.zeros((num_files*256,patch_height,patch_width),
+                       dtype=npy.uint8)
     num_patch=0        
     for f in file_list:
         print "Reading "+f
@@ -82,16 +83,18 @@ def LoadUBCPatchData(datadir,dataname):
     return data_all 
 
   
-def GetUBCPatchDataIter(datadir,dataname,gt_file,batch_size,net_type,
-                        flag_train=False, val_ratio=0):
+def get_UBC_patch_dataiter(
+        datadir,dataname,gt_file,batch_size,net_type,
+        flag_train=False, val_ratio=0):
     
-    gt_info=npy.loadtxt(os.path.join(datadir, dataname, gt_file),dtype=npy.int32)
+    gt_info=npy.loadtxt(os.path.join(datadir, dataname, gt_file),
+                        dtype=npy.int32)
     num_gt_data=gt_info.shape[0]
     pair_idx=gt_info[:,[0,3]]
     gt_label=npy.ones(num_gt_data,dtype=npy.int8)
     gt_label[gt_info[:,1]!=gt_info[:,4]]=-1
     
-    patchdata=LoadUBCPatchData(datadir,dataname)
+    patchdata=load_UBC_patch_data(datadir,dataname)
     
     if flag_train:
         num_val=npy.int32(num_gt_data*val_ratio)
@@ -133,7 +136,7 @@ class ImgClassIter(mx.io.DataIter):
         self.batch_num=len(img_list)/data_shape[0]
         self.cur_batch=0
         self._provide_data=zip(["data"],[data_shape])
-        self._provide_label=[("softmax_label",(data_shape[0],num_class))]
+        self._provide_label=[("softmax_label",(data_shape[0],))]
         self.img_mean=npy.reshape(npy.array([128,128,128]),(1,1,3))
                
     def __iter__(self):
@@ -157,9 +160,9 @@ class ImgClassIter(mx.io.DataIter):
         if self.cur_batch < self.batch_num:
             data_shape=self._provide_data[0][1]
             batch_data=npy.zeros(data_shape, dtype=npy.float32)
-            batch_label=npy.zeros((data_shape[0], self._num_class), dtype=npy.int32)
-            for idx in npy.arange(0, self.batch_size):
-                idx_start=self.batch_size*self.cur_batch 
+#            batch_label=npy.zeros((data_shape[0], self._num_class), dtype=npy.int32)
+            idx_start=self.batch_size*self.cur_batch 
+            for idx in npy.arange(0, self.batch_size):                
                 img=cv2.imread(os.path.join(self._datadir,self._img_list[idx_start+idx]),
                                cv2.IMREAD_COLOR)
                 img=(img-self.img_mean)/96.0                
@@ -167,14 +170,15 @@ class ImgClassIter(mx.io.DataIter):
                 img = npy.swapaxes(img, 1, 2)  # (c, h, w)
                 
                 batch_data[idx,:,:,:]=img
-                batch_label[idx, self._label_list[idx_start+idx]]=1            
+#                batch_label[idx, self._label_list[idx_start+idx]]=1            
+            batch_label=npy.array(self._label_list[idx_start:idx_start+self.batch_size])
             self.cur_batch += 1
             return ImgClassBatch(batch_data,batch_label,0)
         else:
             raise StopIteration
             
             
-def GetImgClassIter(datadir, data_shape, is_train=False, val_ratio=0):
+def get_img_class_iter(datadir, data_shape, is_train=False, val_ratio=0):
     cls_list=os.listdir(datadir)
     if is_train:
         train_img_list=[]
@@ -233,4 +237,4 @@ if __name__=="__main__":
 #    trainIter,valIter=GetUBCPatchDataIter(datadir, dataset,gt_file, 
 #                                          batch_size, "2ch",True,0.1)
     datadir="E:\\DevProj\\Datasets\\NWPU-RESISC45\\images"
-    trainIter,valIter, cls_dict=GetImgClassIter(datadir,(50,3,256,256),True,0.2)
+    trainIter,valIter, cls_dict=get_img_class_iter(datadir,(50,3,256,256),True,0.2)
