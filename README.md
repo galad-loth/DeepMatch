@@ -2,7 +2,7 @@
 Image/Keypoint descriptor learning with convolutional neural network.
 The implementation is based on MxNet.
 
-##Reference
+## Reference
 
 [1] Zagoruyko S, Komodakis N. Learning to compare image patches via convolutional neural networks[C]//Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. 2015: 4353-4361.
 
