@@ -1,4 +1,4 @@
-# LearnDescriptor
+# DeepMatch
 Metric/Embedding learning with (convolutional) neural network with application to image stitching, stereo matching, image retrival, etc.
 
 The implementation is based on MxNet.
