@@ -21,6 +21,11 @@ The implementation is based on MxNet.
 
 [7] Balntas, Vassileios, et al. "HPatches: A benchmark and evaluation of handcrafted and learned local descriptors." [C]. Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. 2017: 
 
+[8] Mihai Dusmanu, Ignacio Rocco and Tomas Pajdla, et al. "D2-Net: A Trainable CNN for Joint Description and Detection of LocalFeatures." [C] CVPR, 2019.
+
+[9] Zixin Luo, Tianwei Shen and Lei Zhou, et al. "ContextDesc: LocalDescriptorAugmentationwithCross-ModalityContext." [C] CVPR, 2019
+
+
 ### Metric Learning
 
 [1] Zagoruyko S, Komodakis N. Learning to compare image patches via convolutional neural networks[C]. Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. 2015: 4353-4361.
